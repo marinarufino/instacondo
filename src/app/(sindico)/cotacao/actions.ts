@@ -48,6 +48,7 @@ export async function criarCotacao(
     .single();
 
   if (error || !quote) {
+    console.error("[criarCotacao] erro ao inserir quote:", error);
     return { erro: "Não foi possível criar a cotação. Tente novamente." };
   }
 
