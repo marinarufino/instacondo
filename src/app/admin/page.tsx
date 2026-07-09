@@ -100,14 +100,19 @@ export default async function AdminDashboard() {
       <h1 className="text-2xl font-bold text-dark">Painel do Administrador</h1>
 
       {/* Métricas */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
         {metrics.map((m) => (
-          <div key={m.label} className="rounded-2xl bg-white p-4 shadow-sm">
+          <div
+            key={m.label}
+            className="min-w-0 rounded-2xl bg-white p-4 shadow-sm"
+          >
             <span className={`flex h-9 w-9 items-center justify-center rounded-lg ${m.cor}`}>
               <m.icon size={18} />
             </span>
-            <p className="mt-3 text-2xl font-extrabold text-dark">{m.valor}</p>
-            <p className="text-xs text-muted">{m.label}</p>
+            <p className="mt-3 text-xl font-extrabold tabular-nums text-dark sm:text-2xl">
+              {m.valor}
+            </p>
+            <p className="text-xs leading-tight text-muted">{m.label}</p>
           </div>
         ))}
       </div>
@@ -128,26 +133,30 @@ export default async function AdminDashboard() {
         {/* Empresas */}
         <section className="rounded-2xl bg-white p-5 shadow-sm">
           <h2 className="mb-3 text-base font-bold text-dark">Empresas</h2>
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
+          <div className="-mx-2 overflow-x-auto px-2">
+            <table className="w-full min-w-[440px] text-left text-sm">
               <thead>
                 <tr className="border-b border-slate-100 text-xs text-muted">
-                  <th className="pb-2">Nome</th>
-                  <th className="pb-2">Região</th>
-                  <th className="pb-2 text-center">Carteiras</th>
-                  <th className="pb-2 text-center">Cotações</th>
-                  <th className="pb-2 text-right">Assinatura</th>
+                  <th className="whitespace-nowrap pb-2 pr-3">Nome</th>
+                  <th className="whitespace-nowrap pb-2 pr-3">Região</th>
+                  <th className="whitespace-nowrap pb-2 pr-3 text-center">Carteiras</th>
+                  <th className="whitespace-nowrap pb-2 pr-3 text-center">Cotações</th>
+                  <th className="whitespace-nowrap pb-2 text-right">Assinatura</th>
                 </tr>
               </thead>
               <tbody>
                 {comps.map((c) => (
                   <tr key={c.id} className="border-b border-slate-50">
-                    <td className="py-2 font-medium text-dark">{c.nome}</td>
-                    <td className="py-2 text-muted">{nomeRegiao(c.regions)}</td>
-                    <td className="py-2 text-center text-muted">
+                    <td className="max-w-[140px] truncate py-2 pr-3 font-medium text-dark">
+                      {c.nome}
+                    </td>
+                    <td className="whitespace-nowrap py-2 pr-3 text-muted">
+                      {nomeRegiao(c.regions)}
+                    </td>
+                    <td className="py-2 pr-3 text-center text-muted">
                       {carteirasPorEmpresa.get(c.id) ?? 0}
                     </td>
-                    <td className="py-2 text-center text-muted">
+                    <td className="py-2 pr-3 text-center text-muted">
                       {cotacoesPorEmpresa.get(c.id) ?? 0}
                     </td>
                     <td className="py-2 text-right">
@@ -170,13 +179,15 @@ export default async function AdminDashboard() {
         {/* Síndicos */}
         <section className="rounded-2xl bg-white p-5 shadow-sm">
           <h2 className="mb-3 text-base font-bold text-dark">Síndicos</h2>
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
+          <div className="-mx-2 overflow-x-auto px-2">
+            <table className="w-full min-w-[360px] text-left text-sm">
               <thead>
                 <tr className="border-b border-slate-100 text-xs text-muted">
-                  <th className="pb-2">Nome</th>
-                  <th className="pb-2 text-center">Empresas na carteira</th>
-                  <th className="pb-2 text-right">Situação</th>
+                  <th className="whitespace-nowrap pb-2 pr-3">Nome</th>
+                  <th className="whitespace-nowrap pb-2 pr-3 text-center">
+                    Empresas na carteira
+                  </th>
+                  <th className="whitespace-nowrap pb-2 text-right">Situação</th>
                 </tr>
               </thead>
               <tbody>
@@ -184,10 +195,10 @@ export default async function AdminDashboard() {
                   const ativo = sindicoTemCotacao.has(s.id);
                   return (
                     <tr key={s.id} className="border-b border-slate-50">
-                      <td className="py-2 font-medium text-dark">
+                      <td className="max-w-[160px] truncate py-2 pr-3 font-medium text-dark">
                         {s.nome || "—"}
                       </td>
-                      <td className="py-2 text-center text-muted">
+                      <td className="py-2 pr-3 text-center text-muted">
                         {empresasPorSindico.get(s.id) ?? 0}
                       </td>
                       <td className="py-2 text-right">
