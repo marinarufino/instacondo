@@ -1,0 +1,36 @@
+@import "tailwindcss";
+
+/* ── Paleta oficial Connexa ─────────────────────────────── */
+:root {
+  --background: #f8fafc;
+  --foreground: #0f172a;
+}
+
+@theme inline {
+  /* Cores da identidade visual */
+  --color-primary: #6d28d9; /* roxo principal */
+  --color-primary-light: #8b5cf6; /* roxo claro (gradientes/hover) */
+  --color-dark: #0f172a; /* azul-marinho — títulos e textos */
+  --color-muted: #64748b; /* cinza — textos secundários */
+  --color-ice: #f8fafc; /* branco gelo — fundo das telas */
+  --color-accent: #06b6d4; /* ciano — destaques pontuais */
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-poppins);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-poppins), system-ui, sans-serif;
+}
+
+/* Esconde a scrollbar em carrosséis horizontais (categorias etc.) */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
