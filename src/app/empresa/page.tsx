@@ -36,15 +36,15 @@ export default async function EmpresaHome() {
       icon: Bell,
       titulo: "Cotações",
       desc: "Recebidas dos síndicos",
-      href: null,
-      etapa: "Etapa 6",
+      href: "/empresa/cotacoes",
+      etapa: null,
     },
     {
       icon: Calendar,
       titulo: "Agenda",
       desc: "Visitas marcadas",
-      href: null,
-      etapa: "Etapa 7",
+      href: "/empresa/cotacoes",
+      etapa: null,
     },
   ];
 

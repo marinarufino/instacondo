@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { Plus, FileText } from "lucide-react";
+import { Plus, FileText, CalendarCheck } from "lucide-react";
 import PageHeader from "@/components/PageHeader";
 import CotacaoCard, { type CotacaoResumo } from "./CotacaoCard";
 
@@ -56,6 +56,20 @@ export default async function CotacaoPage() {
           className="flex items-center justify-center gap-2 rounded-full bg-gradient-to-br from-primary-light to-primary px-5 py-3.5 text-sm font-semibold text-white shadow-lg shadow-primary/30 transition-transform active:scale-[0.98]"
         >
           <Plus size={18} /> Nova cotação
+        </Link>
+
+        <Link
+          href="/cotacao/visitas"
+          className="mt-3 flex items-center gap-3 rounded-2xl bg-white p-4 shadow-sm transition-transform active:scale-[0.99]"
+        >
+          <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10 text-accent">
+            <CalendarCheck size={20} />
+          </span>
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-dark">Minhas visitas</p>
+            <p className="text-xs text-muted">Agenda de visitas confirmadas</p>
+          </div>
+          <span className="text-muted">›</span>
         </Link>
 
         {cotacoes.length > 0 ? (

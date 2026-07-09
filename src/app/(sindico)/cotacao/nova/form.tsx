@@ -14,7 +14,8 @@ import {
 import { createClient } from "@/lib/supabase/client";
 import Button from "@/components/ui/Button";
 import { Field, Input, Select } from "@/components/ui/Field";
-import { criarCotacao } from "../actions";
+import { criarCotacao, type Slot } from "../actions";
+import CalendarioPicker from "./CalendarioPicker";
 
 export type CarteiraEmpresa = {
   id: string;
@@ -39,6 +40,7 @@ export default function NovaCotacaoForm({
   const [enviandoFoto, setEnviandoFoto] = useState(false);
   const [selecao, setSelecao] = useState<Set<string>>(new Set());
   const [modalEmpresas, setModalEmpresas] = useState(false);
+  const [slots, setSlots] = useState<Slot[]>([]);
   const [erro, setErro] = useState<string | null>(null);
 
   // Agrupa a carteira por segmento para a seleção
@@ -110,6 +112,7 @@ export default function NovaCotacaoForm({
           | "alta",
         fotos: fotos.map((f) => f.url),
         empresaIds: [...selecao],
+        slots,
       });
       if (res.erro) setErro(res.erro);
       else router.push("/cotacao");
@@ -238,6 +241,9 @@ export default function NovaCotacaoForm({
             </p>
           )}
         </div>
+
+        {/* Calendário de agendamento */}
+        <CalendarioPicker totalEmpresas={selecao.size} onChange={setSlots} />
 
         {erro && (
           <p className="rounded-xl bg-red-50 px-4 py-3 text-xs font-medium text-red-600">
