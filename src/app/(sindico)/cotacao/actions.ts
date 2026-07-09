@@ -3,6 +3,9 @@
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { sendEmail, emailLayout } from "@/lib/email";
+
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
 export type Slot = { inicio: string; fim: string }; // ISO datetime
 
@@ -90,6 +93,32 @@ export async function criarCotacao(
   if (convErro) {
     return { erro: "Cotação criada, mas houve erro ao convidar as empresas." };
   }
+
+  // Notifica as empresas convidadas por e-mail
+  const { data: empresas } = await supabase
+    .from("companies")
+    .select("nome, profiles(email)")
+    .in("id", dados.empresaIds);
+
+  type EmpresaEmail = {
+    nome: string;
+    profiles: { email: string } | { email: string }[] | null;
+  };
+  await Promise.all(
+    ((empresas as EmpresaEmail[]) ?? []).map((e) => {
+      const p = Array.isArray(e.profiles) ? e.profiles[0] : e.profiles;
+      if (!p?.email) return Promise.resolve();
+      return sendEmail({
+        to: p.email,
+        subject: "Nova cotação recebida no Connexa",
+        html: emailLayout(
+          "Você recebeu uma nova cotação! 📋",
+          `Olá, <b>${e.nome}</b>! O condomínio <b>${dados.condominio}</b> solicitou uma cotação para o serviço de <b>${dados.servico}</b>.<br/><br/>Entre no app para ver os detalhes, escolher um horário e responder.`,
+          { label: "Ver cotação", url: `${APP_URL}/empresa/cotacoes` }
+        ),
+      });
+    })
+  );
 
   revalidatePath("/cotacao");
   return { ok: true };
