@@ -28,12 +28,25 @@ export default function ChatThread({
   const router = useRouter();
   const [texto, setTexto] = useState("");
   const [enviando, setEnviando] = useState(false);
+  const [msgs, setMsgs] = useState<Mensagem[]>(mensagens);
   const fimRef = useRef<HTMLDivElement>(null);
+
+  // Sincroniza com o servidor quando novas mensagens chegam (mantém otimistas locais)
+  useEffect(() => {
+    setMsgs((locais) => {
+      const otimistas = locais.filter((m) => m.id.startsWith("tmp-"));
+      const idsServidor = new Set(mensagens.map((m) => m.content + m.sender_id));
+      const pendentes = otimistas.filter(
+        (m) => !idsServidor.has(m.content + m.sender_id)
+      );
+      return [...mensagens, ...pendentes];
+    });
+  }, [mensagens]);
 
   // Rola para a última mensagem
   useEffect(() => {
     fimRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [mensagens.length]);
+  }, [msgs.length]);
 
   // Atualização automática (busca novas mensagens a cada 5s)
   useEffect(() => {
@@ -47,6 +60,16 @@ export default function ChatThread({
     if (!conteudo || enviando) return;
     setEnviando(true);
     setTexto("");
+
+    // Mostra a mensagem imediatamente (otimista)
+    const temp: Mensagem = {
+      id: `tmp-${Date.now()}`,
+      sender_id: currentUserId,
+      content: conteudo,
+      created_at: new Date().toISOString(),
+    };
+    setMsgs((m) => [...m, temp]);
+
     await enviarMensagem(otherId, conteudo);
     router.refresh();
     setEnviando(false);
@@ -69,13 +92,13 @@ export default function ChatThread({
 
       {/* Mensagens */}
       <div className="flex-1 overflow-y-auto px-4 py-4">
-        {mensagens.length === 0 ? (
+        {msgs.length === 0 ? (
           <p className="mt-8 text-center text-sm text-muted">
             Nenhuma mensagem ainda. Diga olá! 👋
           </p>
         ) : (
           <div className="flex flex-col gap-2">
-            {mensagens.map((m) => {
+            {msgs.map((m) => {
               const minha = m.sender_id === currentUserId;
               return (
                 <div

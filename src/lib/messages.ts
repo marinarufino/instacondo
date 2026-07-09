@@ -18,29 +18,21 @@ export type Mensagem = {
   created_at: string;
 };
 
-/** Nome de exibição por perfil (empresa → nome da empresa; senão nome do perfil) */
+/**
+ * Nome de exibição por perfil (empresa → nome da empresa; senão nome do perfil).
+ * Usa a função segura display_names, que contorna o RLS de profiles apenas
+ * para expor o nome de exibição das pessoas com quem o usuário conversa.
+ */
 async function nomesDisplay(supabase: SB, ids: string[]) {
   const mapa = new Map<string, { nome: string; ehEmpresa: boolean }>();
   if (ids.length === 0) return mapa;
 
-  const [{ data: profs }, { data: comps }] = await Promise.all([
-    supabase.from("profiles").select("id, nome, role").in("id", ids),
-    supabase.from("companies").select("profile_id, nome").in("profile_id", ids),
-  ]);
-
-  const compMap = new Map(
-    ((comps as { profile_id: string; nome: string }[]) ?? []).map((c) => [
-      c.profile_id,
-      c.nome,
-    ])
+  const { data } = await supabase.rpc("display_names", { ids });
+  ((data as { id: string; nome: string; eh_empresa: boolean }[]) ?? []).forEach(
+    (r) => {
+      mapa.set(r.id, { nome: r.nome, ehEmpresa: r.eh_empresa });
+    }
   );
-  ((profs as { id: string; nome: string; role: string }[]) ?? []).forEach((p) => {
-    const ehEmpresa = p.role === "empresa";
-    mapa.set(p.id, {
-      nome: ehEmpresa ? compMap.get(p.id) || p.nome || "Empresa" : p.nome || "Síndico",
-      ehEmpresa,
-    });
-  });
   return mapa;
 }
 
