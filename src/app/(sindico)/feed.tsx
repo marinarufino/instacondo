@@ -13,7 +13,39 @@ import {
   Clapperboard,
   UserRound,
 } from "lucide-react";
+import { ConnexaMark } from "@/components/ConnexaLogo";
 import { toggleLike, toggleWallet } from "./feed-actions";
+
+/** Barra superior sobreposta ao feed — dá acesso ao perfil (e logout) */
+function FeedTopBar({ light = false }: { light?: boolean }) {
+  return (
+    <div className="pointer-events-none absolute inset-x-0 top-0 z-30 flex items-center justify-between px-4 pb-6 pt-5">
+      {/* Gradiente para leitura sobre o vídeo */}
+      {light ? null : (
+        <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-24 bg-gradient-to-b from-black/50 to-transparent" />
+      )}
+      <div
+        className={`flex items-center gap-2 ${
+          light ? "text-dark" : "text-white"
+        }`}
+      >
+        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white">
+          <ConnexaMark size={20} />
+        </span>
+        <span className="text-base font-bold">Connexa</span>
+      </div>
+      <Link
+        href="/perfil"
+        aria-label="Meu perfil"
+        className={`pointer-events-auto flex h-10 w-10 items-center justify-center rounded-full backdrop-blur ${
+          light ? "bg-primary/10 text-primary" : "bg-white/20 text-white"
+        }`}
+      >
+        <UserRound size={20} />
+      </Link>
+    </div>
+  );
+}
 
 export type FeedVideo = {
   id: string;
@@ -69,15 +101,18 @@ export default function Feed({
 }) {
   if (videos.length === 0) {
     return (
-      <div className="flex h-[calc(100dvh-5.5rem)] flex-col items-center justify-center gap-3 px-8 text-center">
-        <span className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-          <Clapperboard size={30} />
-        </span>
-        <h1 className="text-lg font-bold text-dark">Nenhum vídeo por aqui</h1>
-        <p className="text-sm text-muted">
-          Ainda não há empresas com vídeos publicados na sua região. Volte em
-          breve!
-        </p>
+      <div className="relative h-[calc(100dvh-5.5rem)]">
+        <FeedTopBar light />
+        <div className="flex h-full flex-col items-center justify-center gap-3 px-8 text-center">
+          <span className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+            <Clapperboard size={30} />
+          </span>
+          <h1 className="text-lg font-bold text-dark">Nenhum vídeo por aqui</h1>
+          <p className="text-sm text-muted">
+            Ainda não há empresas com vídeos publicados na sua região. Volte em
+            breve!
+          </p>
+        </div>
       </div>
     );
   }
@@ -85,14 +120,17 @@ export default function Feed({
   const itens = montarFeed(videos, sponsors, bannerFreq);
 
   return (
-    <div className="h-[calc(100dvh-5.5rem)] snap-y snap-mandatory overflow-y-scroll">
-      {itens.map((item, i) =>
-        item.tipo === "video" ? (
-          <VideoSlide key={item.video.id} video={item.video} />
-        ) : (
-          <BannerSlide key={`banner-${i}`} sponsor={item.sponsor} />
-        )
-      )}
+    <div className="relative h-[calc(100dvh-5.5rem)]">
+      <FeedTopBar />
+      <div className="h-full snap-y snap-mandatory overflow-y-scroll">
+        {itens.map((item, i) =>
+          item.tipo === "video" ? (
+            <VideoSlide key={item.video.id} video={item.video} />
+          ) : (
+            <BannerSlide key={`banner-${i}`} sponsor={item.sponsor} />
+          )
+        )}
+      </div>
     </div>
   );
 }
