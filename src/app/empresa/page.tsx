@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { Video, Bell, Calendar, LogOut, CheckCircle2, Clock } from "lucide-react";
 import { logout } from "../(auth)/actions";
 import { ConnexaMark } from "@/components/ConnexaLogo";
@@ -24,9 +25,27 @@ export default async function EmpresaHome() {
   const ativa = company.assinatura_ativa;
 
   const atalhos = [
-    { icon: Video, titulo: "Meus vídeos", desc: "Até 5 vídeos", etapa: "Etapa 4" },
-    { icon: Bell, titulo: "Cotações", desc: "Recebidas dos síndicos", etapa: "Etapa 6" },
-    { icon: Calendar, titulo: "Agenda", desc: "Visitas marcadas", etapa: "Etapa 7" },
+    {
+      icon: Video,
+      titulo: "Meus vídeos",
+      desc: "Até 5 vídeos",
+      href: "/empresa/videos",
+      etapa: null,
+    },
+    {
+      icon: Bell,
+      titulo: "Cotações",
+      desc: "Recebidas dos síndicos",
+      href: null,
+      etapa: "Etapa 6",
+    },
+    {
+      icon: Calendar,
+      titulo: "Agenda",
+      desc: "Visitas marcadas",
+      href: null,
+      etapa: "Etapa 7",
+    },
   ];
 
   return (
@@ -64,23 +83,40 @@ export default async function EmpresaHome() {
       <section className="px-6 py-6">
         <h2 className="mb-3 text-base font-bold text-dark">Gerenciar</h2>
         <div className="flex flex-col gap-3">
-          {atalhos.map(({ icon: Icon, titulo, desc, etapa }) => (
-            <div
-              key={titulo}
-              className="flex items-center gap-3 rounded-2xl bg-white p-4 shadow-sm"
-            >
-              <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                <Icon size={20} />
-              </span>
-              <div className="flex-1">
-                <p className="text-sm font-semibold text-dark">{titulo}</p>
-                <p className="text-xs text-muted">{desc}</p>
+          {atalhos.map(({ icon: Icon, titulo, desc, href, etapa }) => {
+            const conteudo = (
+              <>
+                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                  <Icon size={20} />
+                </span>
+                <div className="flex-1">
+                  <p className="text-sm font-semibold text-dark">{titulo}</p>
+                  <p className="text-xs text-muted">{desc}</p>
+                </div>
+                {etapa && (
+                  <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-semibold text-muted">
+                    {etapa}
+                  </span>
+                )}
+              </>
+            );
+            return href ? (
+              <Link
+                key={titulo}
+                href={href}
+                className="flex items-center gap-3 rounded-2xl bg-white p-4 shadow-sm transition-transform active:scale-[0.99]"
+              >
+                {conteudo}
+              </Link>
+            ) : (
+              <div
+                key={titulo}
+                className="flex items-center gap-3 rounded-2xl bg-white p-4 opacity-70 shadow-sm"
+              >
+                {conteudo}
               </div>
-              <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-semibold text-muted">
-                {etapa}
-              </span>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </section>
     </main>

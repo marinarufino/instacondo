@@ -46,7 +46,7 @@ export default async function PerfilPage() {
         </div>
       </header>
 
-      <section className="px-6 py-6">
+      <section className="px-6 pb-28 pt-6">
         <h2 className="mb-3 text-sm font-bold text-dark">Meus dados</h2>
         <div className="flex flex-col gap-3 rounded-2xl bg-white p-4 shadow-sm">
           <InfoRow icon={<Mail size={18} />} label="E-mail" value={profile?.email || "—"} />

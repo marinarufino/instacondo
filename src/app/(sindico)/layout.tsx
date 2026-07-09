@@ -27,7 +27,7 @@ export default async function SindicoLayout({
 
   return (
     <>
-      <main className="flex-1 pb-24">{children}</main>
+      <main className="flex-1">{children}</main>
       <BottomNav />
     </>
   );
