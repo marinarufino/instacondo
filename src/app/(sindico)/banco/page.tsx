@@ -5,6 +5,7 @@ import BancoList, { type WalletCompany } from "./BancoList";
 
 type CompanyJoin = {
   id: string;
+  profile_id: string;
   nome: string;
   cidade: string;
   onde_atende: string;
@@ -27,7 +28,7 @@ export default async function BancoPage() {
   const { data: raw } = await supabase
     .from("wallet")
     .select(
-      "company_id, companies(id, nome, cidade, onde_atende, segments(nome))"
+      "company_id, companies(id, profile_id, nome, cidade, onde_atende, segments(nome))"
     )
     .eq("sindico_id", user.id);
 
@@ -38,6 +39,7 @@ export default async function BancoPage() {
       const seg = Array.isArray(c.segments) ? c.segments[0] : c.segments;
       return {
         id: c.id,
+        profileId: c.profile_id,
         nome: c.nome,
         cidade: c.cidade,
         onde_atende: c.onde_atende,

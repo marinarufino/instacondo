@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { UserRound, MapPin, Briefcase } from "lucide-react";
+import { UserRound, MapPin, Briefcase, MessageCircle } from "lucide-react";
 import WalletButton from "@/components/WalletButton";
 
 export type WalletCompany = {
   id: string;
+  profileId: string;
   nome: string;
   cidade: string;
   onde_atende: string;
@@ -71,8 +72,10 @@ export default function BancoList({
                 <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-primary-light to-primary text-white">
                   <UserRound size={22} />
                 </span>
-                <div className="flex-1">
-                  <p className="text-sm font-semibold text-dark">{e.nome}</p>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-semibold text-dark">
+                    {e.nome}
+                  </p>
                   {(e.cidade || e.onde_atende) && (
                     <p className="mt-0.5 flex items-center gap-1 text-xs text-muted">
                       <MapPin size={11} />
@@ -80,6 +83,13 @@ export default function BancoList({
                     </p>
                   )}
                 </div>
+                <Link
+                  href={`/mensagens/${e.profileId}`}
+                  aria-label="Conversar"
+                  className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-primary"
+                >
+                  <MessageCircle size={16} />
+                </Link>
                 <WalletButton
                   companyId={e.id}
                   inicial={true}

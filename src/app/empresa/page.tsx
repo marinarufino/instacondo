@@ -1,9 +1,18 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { Video, Bell, Calendar, LogOut, CheckCircle2, Clock } from "lucide-react";
+import {
+  Video,
+  Bell,
+  Calendar,
+  MessageCircle,
+  LogOut,
+  CheckCircle2,
+  Clock,
+} from "lucide-react";
 import { logout } from "../(auth)/actions";
 import { ConnexaMark } from "@/components/ConnexaLogo";
+import { contarNaoLidas } from "@/lib/messages";
 
 /** Painel inicial da empresa */
 export default async function EmpresaHome() {
@@ -23,6 +32,7 @@ export default async function EmpresaHome() {
   if (!company) redirect("/empresa/cadastro");
 
   const ativa = company.assinatura_ativa;
+  const naoLidas = await contarNaoLidas(supabase, user.id);
 
   const atalhos = [
     {
@@ -30,21 +40,28 @@ export default async function EmpresaHome() {
       titulo: "Meus vídeos",
       desc: "Até 5 vídeos",
       href: "/empresa/videos",
-      etapa: null,
+      badge: 0,
     },
     {
       icon: Bell,
       titulo: "Cotações",
       desc: "Recebidas dos síndicos",
       href: "/empresa/cotacoes",
-      etapa: null,
+      badge: 0,
+    },
+    {
+      icon: MessageCircle,
+      titulo: "Mensagens",
+      desc: "Converse com os síndicos",
+      href: "/empresa/mensagens",
+      badge: naoLidas,
     },
     {
       icon: Calendar,
       titulo: "Agenda",
       desc: "Visitas marcadas",
       href: "/empresa/cotacoes",
-      etapa: null,
+      badge: 0,
     },
   ];
 
@@ -83,40 +100,26 @@ export default async function EmpresaHome() {
       <section className="px-6 py-6">
         <h2 className="mb-3 text-base font-bold text-dark">Gerenciar</h2>
         <div className="flex flex-col gap-3">
-          {atalhos.map(({ icon: Icon, titulo, desc, href, etapa }) => {
-            const conteudo = (
-              <>
-                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                  <Icon size={20} />
-                </span>
-                <div className="flex-1">
-                  <p className="text-sm font-semibold text-dark">{titulo}</p>
-                  <p className="text-xs text-muted">{desc}</p>
-                </div>
-                {etapa && (
-                  <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-semibold text-muted">
-                    {etapa}
-                  </span>
-                )}
-              </>
-            );
-            return href ? (
-              <Link
-                key={titulo}
-                href={href}
-                className="flex items-center gap-3 rounded-2xl bg-white p-4 shadow-sm transition-transform active:scale-[0.99]"
-              >
-                {conteudo}
-              </Link>
-            ) : (
-              <div
-                key={titulo}
-                className="flex items-center gap-3 rounded-2xl bg-white p-4 opacity-70 shadow-sm"
-              >
-                {conteudo}
+          {atalhos.map(({ icon: Icon, titulo, desc, href, badge }) => (
+            <Link
+              key={titulo}
+              href={href}
+              className="flex items-center gap-3 rounded-2xl bg-white p-4 shadow-sm transition-transform active:scale-[0.99]"
+            >
+              <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                <Icon size={20} />
+              </span>
+              <div className="flex-1">
+                <p className="text-sm font-semibold text-dark">{titulo}</p>
+                <p className="text-xs text-muted">{desc}</p>
               </div>
-            );
-          })}
+              {badge > 0 && (
+                <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1.5 text-[11px] font-bold text-white">
+                  {badge > 9 ? "9+" : badge}
+                </span>
+              )}
+            </Link>
+          ))}
         </div>
       </section>
     </main>

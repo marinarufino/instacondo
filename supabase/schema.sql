@@ -296,6 +296,28 @@ create policy "proposals_access" on proposals for all
   with check (qc_is_my_company(quote_company_id));
 
 -- ============================================================
+-- MENSAGENS — chat entre síndico e empresa
+-- ============================================================
+create table messages (
+  id uuid primary key default gen_random_uuid(),
+  sender_id uuid not null references profiles(id) on delete cascade,
+  recipient_id uuid not null references profiles(id) on delete cascade,
+  content text not null,
+  read boolean not null default false,
+  created_at timestamptz not null default now()
+);
+create index idx_messages_pair on messages (sender_id, recipient_id, created_at);
+create index idx_messages_recipient on messages (recipient_id, read);
+
+alter table messages enable row level security;
+create policy "messages_read" on messages for select
+  using (sender_id = auth.uid() or recipient_id = auth.uid());
+create policy "messages_insert" on messages for insert
+  with check (sender_id = auth.uid());
+create policy "messages_update" on messages for update
+  using (recipient_id = auth.uid());
+
+-- ============================================================
 -- PERFIL AUTOMÁTICO ao criar usuário no Auth
 -- ============================================================
 create or replace function handle_new_user()

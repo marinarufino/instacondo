@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import BottomNav from "@/components/BottomNav";
+import { contarNaoLidas } from "@/lib/messages";
 
 /**
  * Layout das telas do síndico — exige login e inclui a navegação inferior.
@@ -25,10 +26,12 @@ export default async function SindicoLayout({
   if (profile?.role === "empresa") redirect("/empresa");
   if (profile?.role === "admin") redirect("/admin");
 
+  const naoLidas = await contarNaoLidas(supabase, user.id);
+
   return (
     <>
       <main className="flex-1">{children}</main>
-      <BottomNav />
+      <BottomNav naoLidas={naoLidas} />
     </>
   );
 }
