@@ -12,10 +12,23 @@ export const metadata: Metadata = {
   title: "Connexa",
   description:
     "Conecta. Facilita. Transforma. — Conectando síndicos a empresas confiáveis.",
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Connexa",
+  },
+  icons: {
+    icon: "/icon.svg",
+    apple: "/apple-icon.png",
+  },
 };
 
 export const viewport: Viewport = {
   themeColor: "#6d28d9",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
 };
 
 export default function RootLayout({

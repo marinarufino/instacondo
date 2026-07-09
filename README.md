@@ -1,36 +1,54 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Connexa
 
-## Getting Started
+> **Conecta. Facilita. Transforma.** — micro rede social de vídeos que conecta síndicos a empresas/fornecedores de condomínio.
 
-First, run the development server:
+App web mobile-first (PWA), construído com **Next.js + TypeScript + Tailwind CSS** e **Supabase** (autenticação, banco de dados e armazenamento de vídeos).
+
+## Rodando localmente
 
 ```bash
+npm install
+# Copie .env.local.example para .env.local e preencha as chaves do Supabase
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abra http://localhost:3000
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Variáveis de ambiente
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Veja `.env.local.example`. As essenciais:
 
-## Learn More
+| Variável | Descrição |
+|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL` | URL do projeto Supabase |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Chave pública (anon/publishable) |
+| `NEXT_PUBLIC_APP_URL` | URL pública do app (usada nos links dos e-mails) |
+| `RESEND_API_KEY` | (Opcional) chave do Resend para envio de e-mails |
+| `EMAIL_FROM` | (Opcional) remetente dos e-mails |
 
-To learn more about Next.js, take a look at the following resources:
+## Banco de dados
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Os scripts SQL ficam em `supabase/`:
+- `schema.sql` — cria todas as tabelas, políticas (RLS), triggers e dados iniciais. Rode uma vez no SQL Editor.
+- `tornar_admin.sql` — promove um usuário a administrador.
+- `ativar_empresas_teste.sql` — utilitário para ativar assinaturas em testes.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Deploy na Vercel
 
-## Deploy on Vercel
+1. Faça login em [vercel.com](https://vercel.com) com o GitHub.
+2. **Add New → Project** e selecione o repositório `instacondo`.
+3. Em **Environment Variables**, adicione as variáveis acima (a `NEXT_PUBLIC_APP_URL` deve ser a URL final do projeto na Vercel).
+4. **Deploy**. A cada push na branch `main`, a Vercel publica automaticamente.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Estrutura
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `src/app/(auth)` — login e cadastro
+- `src/app/(sindico)` — feed, filtro, cotação, banco de empresas, perfil
+- `src/app/empresa` — área da empresa (vídeos, cotações recebidas)
+- `src/app/admin` — painel do administrador (métricas, mapa, gestão)
+- `src/lib` — clientes Supabase, e-mail e tipos
+
+## Roadmap
+
+- **Fase 2** — IA comparativa de propostas (anexos já previstos no schema)
+- **Fase 3** — App do Condomínio (modelo simples)
