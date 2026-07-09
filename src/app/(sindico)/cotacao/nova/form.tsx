@@ -252,8 +252,8 @@ export default function NovaCotacaoForm({
 
       {/* Modal de seleção de empresas (carteira agrupada por tema) */}
       {modalEmpresas && (
-        <div className="absolute inset-0 z-30 flex items-end bg-black/50">
-          <div className="max-h-[80%] w-full overflow-y-auto rounded-t-3xl bg-white p-6">
+        <div className="fixed inset-0 z-[60] mx-auto flex max-w-md items-end bg-black/50">
+          <div className="max-h-[85dvh] w-full overflow-y-auto rounded-t-3xl bg-white p-6 pb-8">
             <div className="mb-4 flex items-center justify-between">
               <h2 className="text-lg font-bold text-dark">Escolher empresas</h2>
               <button
