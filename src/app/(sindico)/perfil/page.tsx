@@ -1,8 +1,10 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { LogOut, Mail, Phone, MapPin, ChevronLeft, UserRound } from "lucide-react";
+import { LogOut, Mail, Phone, ChevronLeft, UserRound } from "lucide-react";
 import { logout } from "@/app/(auth)/actions";
+import RegiaoEditor from "./RegiaoEditor";
+import type { Region } from "@/lib/types";
 
 /** Tela de Perfil do síndico — dados da conta e botão de sair */
 export default async function PerfilPage() {
@@ -12,21 +14,17 @@ export default async function PerfilPage() {
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("nome, email, telefone, region_id, regions(nome)")
-    .eq("id", user.id)
-    .single();
+  const [{ data: profile }, { data: regioesRaw }] = await Promise.all([
+    supabase
+      .from("profiles")
+      .select("nome, email, telefone, region_id")
+      .eq("id", user.id)
+      .single(),
+    supabase.from("regions").select("id, nome, ativa").eq("ativa", true).order("nome"),
+  ]);
 
   const nome = profile?.nome || "Síndico";
-  // O join pode vir como objeto ou array dependendo da inferência do Supabase
-  const regioes = profile?.regions as
-    | { nome: string }
-    | { nome: string }[]
-    | null;
-  const regiao =
-    (Array.isArray(regioes) ? regioes[0]?.nome : regioes?.nome) ??
-    "Não informada";
+  const regioes = (regioesRaw as Region[]) ?? [];
 
   return (
     <div className="flex-1">
@@ -51,7 +49,7 @@ export default async function PerfilPage() {
         <div className="flex flex-col gap-3 rounded-2xl bg-white p-4 shadow-sm">
           <InfoRow icon={<Mail size={18} />} label="E-mail" value={profile?.email || "—"} />
           <InfoRow icon={<Phone size={18} />} label="Telefone" value={profile?.telefone || "Não informado"} />
-          <InfoRow icon={<MapPin size={18} />} label="Região" value={regiao} />
+          <RegiaoEditor regioes={regioes} atual={profile?.region_id ?? null} />
         </div>
 
         <form action={logout} className="mt-6">

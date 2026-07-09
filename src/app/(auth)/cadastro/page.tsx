@@ -1,17 +1,29 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import Link from "next/link";
 import { Building2, UserRound } from "lucide-react";
 import { cadastrar } from "../actions";
 import { ConnexaMark } from "@/components/ConnexaLogo";
 import Button from "@/components/ui/Button";
-import { Field, Input } from "@/components/ui/Field";
-import type { UserRole } from "@/lib/types";
+import { Field, Input, Select } from "@/components/ui/Field";
+import { createClient } from "@/lib/supabase/client";
+import type { UserRole, Region } from "@/lib/types";
 
 export default function CadastroPage() {
   const [state, formAction, pending] = useActionState(cadastrar, {});
   const [role, setRole] = useState<UserRole>("sindico");
+  const [regioes, setRegioes] = useState<Region[]>([]);
+
+  // Carrega as regiões ativas para o síndico escolher
+  useEffect(() => {
+    createClient()
+      .from("regions")
+      .select("id, nome, ativa")
+      .eq("ativa", true)
+      .order("nome")
+      .then(({ data }) => setRegioes((data as Region[]) ?? []));
+  }, []);
 
   return (
     <div className="flex flex-1 flex-col justify-center px-6 py-10">
@@ -66,6 +78,20 @@ export default function CadastroPage() {
             autoComplete="new-password"
           />
         </Field>
+
+        {/* Região — só para o síndico (a empresa informa no cadastro dela) */}
+        {role === "sindico" && (
+          <Field label="Sua região">
+            <Select name="region_id" defaultValue="">
+              <option value="">Selecione (opcional)</option>
+              {regioes.map((r) => (
+                <option key={r.id} value={r.id}>
+                  {r.nome}
+                </option>
+              ))}
+            </Select>
+          </Field>
+        )}
 
         {state.erro && (
           <p className="rounded-xl bg-red-50 px-4 py-3 text-xs font-medium text-red-600">

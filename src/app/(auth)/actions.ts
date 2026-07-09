@@ -43,12 +43,13 @@ export async function cadastrar(
   const email = String(formData.get("email") ?? "").trim();
   const senha = String(formData.get("senha") ?? "");
   const role = String(formData.get("role") ?? "sindico") as UserRole;
+  const regionId = String(formData.get("region_id") ?? "");
 
   if (nome.length < 2) return { erro: "Informe seu nome." };
   if (senha.length < 6) return { erro: "A senha deve ter ao menos 6 caracteres." };
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.signUp({
+  const { data: signUpData, error } = await supabase.auth.signUp({
     email,
     password: senha,
     options: { data: { nome, role } },
@@ -58,6 +59,14 @@ export async function cadastrar(
     if (error.message.toLowerCase().includes("already"))
       return { erro: "Este e-mail já está cadastrado. Faça login." };
     return { erro: "Não foi possível criar a conta. Tente novamente." };
+  }
+
+  // Salva a região do síndico (usada nas métricas/mapa do admin)
+  if (role === "sindico" && regionId && signUpData.user) {
+    await supabase
+      .from("profiles")
+      .update({ region_id: regionId })
+      .eq("id", signUpData.user.id);
   }
 
   // Empresa vai direto pro cadastro complementar (CNPJ, segmento etc.)
