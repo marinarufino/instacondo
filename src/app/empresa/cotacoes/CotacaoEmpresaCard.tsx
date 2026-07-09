@@ -38,7 +38,6 @@ export default function CotacaoEmpresaCard({
   convite: ConviteEmpresa;
 }) {
   const [pending, startTransition] = useTransition();
-  const [escolhendo, setEscolhendo] = useState(false);
   const [slotSel, setSlotSel] = useState<string | null>(null);
   const [erro, setErro] = useState<string | null>(null);
 
@@ -47,9 +46,9 @@ export default function CotacaoEmpresaCard({
 
   function aceitar() {
     setErro(null);
-    // Se tem horários, precisa escolher um
+    // Se tem horários, é obrigatório escolher um
     if (temHorarios && !slotSel) {
-      setEscolhendo(true);
+      setErro("Escolha um horário para aceitar.");
       return;
     }
     startTransition(async () => {
@@ -104,14 +103,15 @@ export default function CotacaoEmpresaCard({
         </p>
       ) : (
         <>
-          {/* Escolha de horário */}
-          {escolhendo && temHorarios && (
-            <div className="mt-3">
-              <p className="mb-2 text-xs font-semibold text-dark">
-                Escolha um horário:
+          {/* Escolha de horário — sempre visível quando há horários */}
+          {temHorarios && (
+            <div className="mt-3 rounded-xl bg-primary/5 p-3">
+              <p className="mb-2 flex items-center gap-1.5 text-xs font-semibold text-dark">
+                <Clock size={13} className="text-primary" />
+                Escolha um horário para a visita:
               </p>
               {disponiveis.length === 0 ? (
-                <p className="rounded-xl bg-amber-50 px-3 py-2 text-xs text-amber-800">
+                <p className="rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800">
                   Todos os horários já foram preenchidos por outras empresas.
                 </p>
               ) : (
@@ -123,11 +123,11 @@ export default function CotacaoEmpresaCard({
                       onClick={() => setSlotSel(s.id)}
                       className={`flex items-center gap-1.5 rounded-full border-2 px-3 py-1.5 text-xs font-medium transition-colors ${
                         slotSel === s.id
-                          ? "border-primary bg-primary/5 text-primary"
-                          : "border-slate-200 text-dark"
+                          ? "border-primary bg-white text-primary"
+                          : "border-slate-200 bg-white text-dark"
                       }`}
                     >
-                      <Clock size={12} />
+                      {slotSel === s.id && <Check size={12} />}
                       {formatarSlot(s.inicio)}
                     </button>
                   ))}
@@ -146,7 +146,7 @@ export default function CotacaoEmpresaCard({
           <div className="mt-4 flex gap-2">
             <button
               onClick={aceitar}
-              disabled={pending || (escolhendo && temHorarios && !slotSel)}
+              disabled={pending || (temHorarios && disponiveis.length === 0)}
               className="flex flex-1 items-center justify-center gap-1.5 rounded-full bg-gradient-to-br from-primary-light to-primary px-3 py-2.5 text-xs font-semibold text-white disabled:opacity-50"
             >
               {pending ? (
@@ -154,11 +154,7 @@ export default function CotacaoEmpresaCard({
               ) : (
                 <Check size={14} />
               )}
-              {temHorarios && !escolhendo
-                ? "Aceitar e agendar"
-                : escolhendo
-                  ? "Confirmar horário"
-                  : "Aceitar"}
+              {temHorarios ? "Aceitar horário" : "Aceitar"}
             </button>
             <button
               onClick={recusar}
