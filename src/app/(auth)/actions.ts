@@ -21,6 +21,12 @@ export async function login(
   });
 
   if (error) {
+    const msg = error.message.toLowerCase();
+    if (msg.includes("not confirmed")) {
+      return {
+        erro: "Seu e-mail ainda não foi confirmado. Confirme pelo link enviado ou peça para desativar a confirmação de e-mail.",
+      };
+    }
     return { erro: "E-mail ou senha incorretos." };
   }
 

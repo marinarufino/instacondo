@@ -8,8 +8,11 @@ import {
   LayoutGrid,
   Star,
   Play,
+  UserRound,
 } from "lucide-react";
+import Link from "next/link";
 import { ConnexaMark } from "@/components/ConnexaLogo";
+import { createClient } from "@/lib/supabase/server";
 
 /** Dados de demonstração — serão substituídos pelo Supabase na Etapa 4 */
 const categorias = [
@@ -26,7 +29,16 @@ const destaques = [
   { nome: "Manuten+", segmento: "Manutenção Predial", nota: 4.7 },
 ];
 
-export default function Home() {
+export default async function Home() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const { data: profile } = user
+    ? await supabase.from("profiles").select("nome").eq("id", user.id).single()
+    : { data: null };
+  const primeiroNome = profile?.nome?.split(" ")[0] || "Síndico";
+
   return (
     <div>
       {/* ── Header roxo (identidade visual) ─────────────── */}
@@ -38,16 +50,25 @@ export default function Home() {
             </span>
             <span className="text-lg font-bold">Connexa</span>
           </div>
-          <button
-            aria-label="Notificações"
-            className="relative rounded-full bg-white/15 p-2"
-          >
-            <Bell size={20} />
-            <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-red-400" />
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              aria-label="Notificações"
+              className="relative rounded-full bg-white/15 p-2"
+            >
+              <Bell size={20} />
+              <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-red-400" />
+            </button>
+            <Link
+              href="/perfil"
+              aria-label="Meu perfil"
+              className="flex h-9 w-9 items-center justify-center rounded-full bg-white/15"
+            >
+              <UserRound size={20} />
+            </Link>
+          </div>
         </div>
 
-        <h1 className="mt-5 text-2xl font-bold">Olá, Síndico! 👋</h1>
+        <h1 className="mt-5 text-2xl font-bold">Olá, {primeiroNome}! 👋</h1>
         <p className="mt-1 text-sm text-white/85">
           Conecte-se com empresas confiáveis e soluções para o seu condomínio.
         </p>
