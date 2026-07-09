@@ -75,13 +75,13 @@ export default async function EmpresaCotacoesPage() {
       id: string;
       quote_id: string;
       inicio: string;
-      appointments: { id: string }[];
+      appointments: { id: string }[] | null;
     };
     ((slots as SlotRow[]) ?? []).forEach((s) => {
       (slotsPorQuote[s.quote_id] ??= []).push({
         id: s.id,
         inicio: s.inicio,
-        ocupado: s.appointments.length > 0,
+        ocupado: (s.appointments?.length ?? 0) > 0,
       });
     });
   }
